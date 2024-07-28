@@ -63,7 +63,7 @@ namespace QuickTemplates.Editor
 			return results;
 		}
 
-		public static TemplateAssetInfo GetTemplateComponentsFromPath(string path)
+		public static TemplateAssetInfo GetTemplateAssetInfoFromPath(string path)
 		{
 			// The directory of the path, excluding file.
 			// Replacing back-slashes with forward-slashes to adhere to Unity's directory structure.
