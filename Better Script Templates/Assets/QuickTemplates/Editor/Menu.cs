@@ -13,7 +13,7 @@ namespace QuickTemplates.Editor
 	public static class Menu
 	{
 		/// <summary>
-		/// Exposes internal Unity  method <see cref="UnityEditor.Menu.AddMenuItem"/> for public use.
+		/// Exposes internal Unity method <see cref="UnityEditor.Menu.AddMenuItem"/> for public use.
 		/// </summary>
 		/// <param name="name"></param>
 		/// <param name="shortcut"></param>
