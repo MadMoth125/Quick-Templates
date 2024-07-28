@@ -9,7 +9,7 @@ using UnityEditor;
 
 namespace QuickTemplates.Editor
 {
-	public static class TemplateManager
+	public static class TemplateAssetManager
 	{
 		private const string RootDirectory = "Assets/";
 		private const string TemplatePrefix = "Template_";
