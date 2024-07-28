@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,10 +25,15 @@ namespace QuickTemplates
 				TextAsset template = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
 				if (template == null) continue;
 
-				templates.Add(new TemplateObject("Assets/Create/", templateInfo.Name + templateInfo.Extension, template));
+				string trimmedName = templateInfo.Name.Substring(templateInfo.Name.IndexOf("_", StringComparison.Ordinal) + 1);
+				templates.Add(new TemplateObject("Assets/Create/" + trimmedName, $"New{trimmedName}{templateInfo.Extension}", template));
 			}
+		}
 
-			templates = templates.OrderBy(t => Path.GetDirectoryName(t.GetTemplatePath())?.Replace("\\", "/")).ToList();
+		[ContextMenu("Sort Order")]
+		public void SortOrder()
+		{
+			templates = templates.OrderBy(t => Path.GetDirectoryName(t.MenuPath)).ToList();
 		}
 
 		[ContextMenu("Refresh Menu")]
@@ -38,8 +44,10 @@ namespace QuickTemplates
 
 		public static TemplateConfigScriptableObject GetTemplateConfigs()
 		{
-			var paths = AssetDatabase.FindAssets($"t:{typeof(TemplateConfigScriptableObject)}", null);
-			var assets = paths.Select(AssetDatabase.LoadAssetAtPath<TemplateConfigScriptableObject>).ToList();
+			List<TemplateConfigScriptableObject> assets = AssetDatabase.FindAssets($"t:{typeof(TemplateConfigScriptableObject)}", null)
+			                                                           .Select(AssetDatabase.GUIDToAssetPath)
+			                                                           .Select(AssetDatabase.LoadAssetAtPath<TemplateConfigScriptableObject>)
+			                                                           .ToList();
 			return assets[0];
 
 		}
