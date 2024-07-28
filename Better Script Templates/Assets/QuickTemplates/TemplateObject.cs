@@ -34,7 +34,7 @@ namespace QuickTemplates
 		/// <summary>
 		/// The asset reference to the template text file.
 		/// </summary>
-		public UnityEngine.Object Template => template;
+		public TextAsset Template => template;
 
 		public TemplateObject()
 		{
