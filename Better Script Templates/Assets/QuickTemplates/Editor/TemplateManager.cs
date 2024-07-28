@@ -63,7 +63,7 @@ namespace QuickTemplates.Editor
 			return results;
 		}
 
-		public static TemplateData GetTemplateComponentsFromPath(string path)
+		public static TemplateAssetInfo GetTemplateComponentsFromPath(string path)
 		{
 			// The directory of the path, excluding file.
 			// Replacing back-slashes with forward-slashes to adhere to Unity's directory structure.
@@ -82,7 +82,7 @@ namespace QuickTemplates.Editor
 			// Assets/Scripts/TemplateFile[.cs].txt
 			string templateExtension = Path.GetExtension(fullTemplateName);
 
-			return new TemplateData(path, onlyName, templateExtension);
+			return new TemplateAssetInfo(path, onlyName, templateExtension);
 		}
 
 		private static bool IsTemplate(string name)

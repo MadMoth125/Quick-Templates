@@ -1,6 +1,6 @@
 namespace QuickTemplates.Editor
 {
-	public struct TemplateData
+	public struct TemplateAssetInfo
 	{
 		/// <summary>
 		/// Asset directory path to the template.
@@ -17,7 +17,7 @@ namespace QuickTemplates.Editor
 		/// </summary>
 		public readonly string Extension;
 
-		public TemplateData(string path, string name, string extension)
+		public TemplateAssetInfo(string path, string name, string extension)
 		{
 			Path = path;
 			Name = name;
