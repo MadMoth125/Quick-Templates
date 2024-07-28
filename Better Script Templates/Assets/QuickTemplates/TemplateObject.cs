@@ -19,7 +19,7 @@ namespace QuickTemplates
 
 		[Tooltip("The asset reference to the template text file.")]
 		[SerializeField]
-		private UnityEngine.Object template;
+		private TextAsset template;
 
 		/// <summary>
 		/// The menu path that this template can be created from.
@@ -42,7 +42,7 @@ namespace QuickTemplates
 			fileName = "NewFile.txt";
 		}
 
-		public TemplateObject(string menuPath, string fileName, UnityEngine.Object template)
+		public TemplateObject(string menuPath, string fileName, TextAsset template)
 		{
 			this.menuPath = menuPath;
 			this.fileName = fileName;
