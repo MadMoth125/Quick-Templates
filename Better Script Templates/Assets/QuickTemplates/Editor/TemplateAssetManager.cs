@@ -65,11 +65,6 @@ namespace QuickTemplates.Editor
 
 		public static TemplateAssetInfo GetTemplateAssetInfoFromPath(string path)
 		{
-			// The directory of the path, excluding file.
-			// Replacing back-slashes with forward-slashes to adhere to Unity's directory structure.
-			// [Assets/Scripts/]TemplateFile.cs.txt
-			// string pathOnly = Path.GetDirectoryName(path)?.Replace("\\", "/") + "/";
-
 			// The name of the file, including the extension relevant to the template.
 			// Assets/Scripts/[TemplateFile.cs].txt
 			string fullTemplateName = Path.GetFileNameWithoutExtension(path);
@@ -101,19 +96,6 @@ namespace QuickTemplates.Editor
 
 			bool textFile = name.EndsWith(expectedExtension);
 			return correctPrefix && validCount && textFile;
-		}
-
-		[Obsolete("Use Path.GetFileName() instead.")]
-		private static string GetFileNameFromPath(string path)
-		{
-
-			// Gets the last sub-folder the path is located at.
-			// Assets/Scripts[/]TemplateFile.cs.txt
-			int fileNameStart = path.LastIndexOf("/", StringComparison.Ordinal);
-
-			// Return only the file name.
-			// Assets/Scripts/[TemplateFile.cs.txt]
-			return fileNameStart < 0 ? "" : path.Substring(fileNameStart + 1);
 		}
 	}
 }
