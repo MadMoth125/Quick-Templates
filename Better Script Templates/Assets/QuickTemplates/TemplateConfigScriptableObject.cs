@@ -35,5 +35,13 @@ namespace QuickTemplates
 		{
 			TemplateAssetManager.RequestScriptReload();
 		}
+
+		public static TemplateConfigScriptableObject GetTemplateConfigs()
+		{
+			var paths = AssetDatabase.FindAssets($"t:{typeof(TemplateConfigScriptableObject)}", null);
+			var assets = paths.Select(AssetDatabase.LoadAssetAtPath<TemplateConfigScriptableObject>).ToList();
+			return assets[0];
+
+		}
 	}
 }
