@@ -1,0 +1,38 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+#ROOTNAMESPACEBEGIN#
+[DefaultExecutionOrder(-1000)]
+public class #SCRIPTNAME# : MonoBehaviour
+{
+	private static #SCRIPTNAME# _instance;
+
+	public static #SCRIPTNAME# Instance
+	{
+		get
+		{
+			if (_instance != null) return _instance;
+
+			_instance = FindObjectOfType<#SCRIPTNAME#>();
+			if (_instance != null) return _instance;
+
+			_instance = new GameObject(nameof(#SCRIPTNAME#)).AddComponent<#SCRIPTNAME#>();
+			return _instance;
+		}
+	}
+
+	private void Awake()
+	{
+		if (_instance == null)
+		{
+			_instance = this;
+		}
+		else if (_instance != this)
+		{
+			Destroy(this);
+		}
+	}
+}
+#ROOTNAMESPACEEND#
