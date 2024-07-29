@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace QuickTemplates
+namespace QuickTemplates.Editor
 {
 	[Serializable]
 	public class TemplateObject

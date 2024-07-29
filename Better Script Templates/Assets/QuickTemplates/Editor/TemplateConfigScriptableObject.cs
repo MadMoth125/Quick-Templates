@@ -1,14 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using QuickTemplates.Editor;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace QuickTemplates
+namespace QuickTemplates.Editor
 {
 	[CreateAssetMenu(fileName = "NewTemplateConfiguration", menuName = "QuickTemplates/Template Configuration")]
 	public class TemplateConfigScriptableObject : ScriptableObject
