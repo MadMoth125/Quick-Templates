@@ -16,22 +16,19 @@ namespace QuickTemplates.Editor
 		[ContextMenu("Load Templates")]
 		public void LoadTemplates()
 		{
+			#if UNITY_EDITOR
 			foreach (string path in TemplateUtils.GetTemplateAssetPaths())
 			{
 				if (templates.Any(t => t.GetTemplatePath() == path)) continue;
 
-				#if UNITY_EDITOR
-				// TemplateAssetInfo templateInfo = TemplateAssetManager.GetTemplateAssetInfoFromPath(path);
 				var template = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
 				if (template == null) continue;
-				#else
-				break;
-				#endif
 
 				string nonPrefixName = TemplateUtils.GetTemplateName(path, includePrefix: false);
 				string templateExtension = TemplateUtils.GetTemplateExtension(path);
 				templates.Add(new TemplateObject("Assets/Create/Templates/" + nonPrefixName, $"New{nonPrefixName}{templateExtension}", template));
 			}
+			#endif
 		}
 
 		[ContextMenu("Sort Order")]
