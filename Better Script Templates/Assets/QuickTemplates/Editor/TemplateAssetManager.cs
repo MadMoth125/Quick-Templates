@@ -115,7 +115,7 @@ namespace QuickTemplates.Editor
 			return correctPrefix && validCount && textFile;
 		}
 
-		[InitializeOnLoadMethod]
+		// [InitializeOnLoadMethod]
 		private static void Initialize()
 		{
 			EditorApplication.delayCall += PopulateMenus;
