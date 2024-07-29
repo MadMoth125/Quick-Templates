@@ -36,6 +36,7 @@ namespace QuickTemplates.Editor
 			return results;
 		}
 
+		#pragma warning disable CS0162
 		public static bool IsTemplate(TextAsset asset)
 		{
 			#if UNITY_EDITOR
@@ -114,5 +115,6 @@ namespace QuickTemplates.Editor
 			#endif
 			return new List<TemplateConfigScriptableObject>();
 		}
+		#pragma warning restore CS0162
 	}
 }
