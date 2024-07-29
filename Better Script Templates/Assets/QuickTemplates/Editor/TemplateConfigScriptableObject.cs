@@ -11,6 +11,8 @@ namespace QuickTemplates.Editor
 	[CreateAssetMenu(fileName = "NewTemplateConfiguration", menuName = "QuickTemplates/Template Configuration")]
 	public class TemplateConfigScriptableObject : ScriptableObject
 	{
+		public string defaultMenuPath = "Assets/Create/Templates/";
+
 		public List<TemplateObject> templates;
 
 		[ContextMenu("Load Templates")]
@@ -26,7 +28,8 @@ namespace QuickTemplates.Editor
 
 				string nonPrefixName = TemplateUtils.GetTemplateName(path, includePrefix: false);
 				string templateExtension = TemplateUtils.GetTemplateExtension(path);
-				templates.Add(new TemplateObject("Assets/Create/Templates/" + nonPrefixName, $"New{nonPrefixName}{templateExtension}", template));
+				string menuPath = defaultMenuPath.EndsWith("/") ? defaultMenuPath : defaultMenuPath + "/";
+				templates.Add(new TemplateObject(menuPath + nonPrefixName, $"New{nonPrefixName}{templateExtension}", template));
 			}
 			#endif
 		}
