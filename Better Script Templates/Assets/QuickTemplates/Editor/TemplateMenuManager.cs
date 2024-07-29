@@ -6,7 +6,7 @@ namespace QuickTemplates.Editor
 {
 	public static class TemplateMenuManager
 	{
-		[InitializeOnLoadMethod]
+		// [InitializeOnLoadMethod]
 		private static void Initialize()
 		{
 			EditorApplication.delayCall += PopulateMenus;

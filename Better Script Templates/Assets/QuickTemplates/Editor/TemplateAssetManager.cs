@@ -32,6 +32,23 @@ namespace QuickTemplates.Editor
 			#endif
 		}
 
+		public static string GetTemplateDirectory(string path)
+		{
+			return Path.GetDirectoryName(path)?.Replace("\\", "/") + "/";
+		}
+
+		public static string GetTemplateName(string path)
+		{
+			return Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(path));
+		}
+
+		public static string GetTemplateExtension(string path)
+		{
+			return Path.GetExtension(Path.GetFileNameWithoutExtension(path));
+		}
+
+		public static List<string> GetTemplatePaths() => GetTemplatePaths(null);
+
 		public static List<string> GetTemplatePaths(params string[] paths)
 		{
 			var results = new List<string>();
@@ -96,6 +113,30 @@ namespace QuickTemplates.Editor
 
 			bool textFile = name.EndsWith(expectedExtension);
 			return correctPrefix && validCount && textFile;
+		}
+
+		[InitializeOnLoadMethod]
+		private static void Initialize()
+		{
+			EditorApplication.delayCall += PopulateMenus;
+		}
+
+		private static void PopulateMenus()
+		{
+			var config = TemplateConfigScriptableObject.GetTemplateConfigs();
+			if (config == null) return;
+
+			foreach (var template in config.templates)
+			{
+				Menu.AddMenuItem(name: template.MenuPath,
+				                 shortcut: "",
+				                 @checked: false,
+				                 priority: config.templates.IndexOf(template) - 100,
+				                 () => CreateFileFromTemplate(template.Template, template.FileName),
+				                 () => true);
+			}
+
+			EditorApplication.delayCall -= PopulateMenus;
 		}
 	}
 }
