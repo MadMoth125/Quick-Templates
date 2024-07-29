@@ -14,7 +14,7 @@ namespace QuickTemplates.Editor
 
 		private static void PopulateMenus()
 		{
-			var config = TemplateConfigScriptableObject.GetTemplateConfigs();
+			/*var config = TemplateConfigScriptableObject.GetTemplateConfigs();
 			if (config == null) return;
 
 			foreach (var template in config.templates)
@@ -27,7 +27,7 @@ namespace QuickTemplates.Editor
 					() => true);
 			}
 
-			EditorApplication.delayCall -= PopulateMenus;
+			EditorApplication.delayCall -= PopulateMenus;*/
 		}
 	}
 }
