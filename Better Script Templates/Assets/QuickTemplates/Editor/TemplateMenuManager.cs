@@ -1,9 +1,12 @@
+
+using System;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace QuickTemplates.Editor
 {
+	[Obsolete]
 	public static class TemplateMenuManager
 	{
 		// [InitializeOnLoadMethod]

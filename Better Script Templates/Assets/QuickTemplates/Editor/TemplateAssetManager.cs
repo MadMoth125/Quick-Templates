@@ -9,6 +9,7 @@ using UnityEditor;
 
 namespace QuickTemplates.Editor
 {
+	[Obsolete]
 	public static class TemplateAssetManager
 	{
 		private const string RootDirectory = "Assets/";

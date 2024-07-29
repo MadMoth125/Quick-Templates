@@ -1,5 +1,8 @@
+using System;
+
 namespace QuickTemplates.Editor
 {
+	[Obsolete]
 	public struct TemplateAssetInfo
 	{
 		/// <summary>
