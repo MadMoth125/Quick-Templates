@@ -36,7 +36,7 @@ namespace QuickTemplates
 		[Tooltip("Specifies the folder location where the auto-generated script will be saved.\n\n" +
 		         "It is recommended to set this path to a folder or subfolder within an Editor Assembly " +
 		         "(e.g., \"Assets/Editor/\") to ensure script is properly excluded from builds.")]
-		public string folderPath = "/Generated/";
+		public string folderPath = "/Editor/Generated/";
 
 		[Header("Template Parsing")]
 		public string templatePrefix = "Template_";
