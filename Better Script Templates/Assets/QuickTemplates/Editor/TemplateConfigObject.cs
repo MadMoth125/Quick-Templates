@@ -46,11 +46,20 @@ namespace QuickTemplates
 		[Header("Template Config")]
 		public List<TemplateData> templates;
 
+		/// <summary>
+		/// Finds all paths of TemplateConfigObject assets in project.
+		/// </summary>
+		/// <returns>A collection of strings representing paths of assets in the project folder.</returns>
 		public static IEnumerable<string> GetInstances()
 		{
 			return AssetDatabase.FindAssets($"t:{nameof(TemplateConfigObject)}").Select(AssetDatabase.GUIDToAssetPath);
 		}
 
+		/// <summary>
+		/// Static method with the MenuItem attribute for creating TemplateConfigObject instances,
+		/// mimicking the functionality of the CreateAssetMenu attribute for ScriptableObjects.
+		/// A dedicated method is used instead of class attribute, so we can have validation when creating instances.
+		/// </summary>
 		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
 		private static void CreateAsset()
 		{
@@ -75,6 +84,10 @@ namespace QuickTemplates
 			Selection.activeObject = asset;
 		}
 
+		/// <summary>
+		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates
+		/// from the first found TemplateConfigObject instance.
+		/// </summary>
 		[MenuItem("QuickTemplates/Re-generate Menu Items")]
 		private static void GenerateFromFirstInstance()
 		{
@@ -89,6 +102,9 @@ namespace QuickTemplates
 			instance.Generate();
 		}
 
+		/// <summary>
+		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates.
+		/// </summary>
 		[ContextMenu("Re-generate Menu Items")]
 		private void Generate()
 		{
@@ -123,10 +139,10 @@ namespace QuickTemplates
 					string identifier = GUID.Generate().ToSimpleString();
 
 					// Derive info from asset for generated method
-					string assetPath = AssetDatabase.GetAssetPath(data.asset);                             // Assets/.../Template_File.cs.txt
-					string assetName = data.asset.name.Replace(" ", "_");                                  // Template_File.cs
+					string assetPath = AssetDatabase.GetAssetPath(data.asset); // Assets/.../Template_File.cs.txt
+					string assetName = data.asset.name.Replace(" ", "_"); // Template_File.cs
 					string assetNameExtensionless = Path.GetFileNameWithoutExtension(assetName); // Template_File
-					string outFileName = $"New{assetName.Replace(templatePrefix, "")}";                    // NewFile.cs
+					string outFileName = $"New{assetName.Replace(templatePrefix, "")}"; // NewFile.cs
 
 					// Append 'Assets/Create/' to path if it doesn't already exist
 					string menuPath = data.path.StartsWith(AssetCreatePath) ? data.path : AssetCreatePath + data.path;
@@ -173,6 +189,10 @@ namespace QuickTemplates
 			}
 		}
 
+		/// <summary>
+		/// Finds all valid text file templates in the project, filters them based on an optional prefix,
+		/// and adds their data to the templates list with estimated menu paths.
+		/// </summary>
 		[ContextMenu("Find Templates")]
 		private void FindTemplates()
 		{
