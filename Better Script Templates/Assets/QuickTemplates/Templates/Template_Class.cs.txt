@@ -6,6 +6,9 @@ using UnityEngine;
 #ROOTNAMESPACEBEGIN#
 public class #SCRIPTNAME#
 {
-	#NOTRIM#
+	public #SCRIPTNAME#()
+	{
+		#NOTRIM#
+	}
 }
 #ROOTNAMESPACEEND#

@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1b579dadb95d542844517fe0506124, type: 3}
+  m_Name: TemplateConfigAsset
+  m_EditorClassIdentifier: 
+  pathMode: 1
+  folderPath: /Editor/Generated/
+  templatePrefix: Template_
+  defaultTemplatePath: Templates/
+  templates:
+  - path: Templates/Class.cs
+    asset: {fileID: 4900000, guid: 787091720dc8a07449a1a3bf8dc3b6de, type: 3}
+  - path: Templates/SerializedClass.cs
+    asset: {fileID: 4900000, guid: 0d6441583f6adc64b9f4058080790085, type: 3}
+  - path: Templates/StaticClass.cs
+    asset: {fileID: 4900000, guid: 3e8e2dbfb7894624ea30e712b5b4fda8, type: 3}
+  - path: Templates/AbstractClass.cs
+    asset: {fileID: 4900000, guid: dfeb17b5bd7cd7149926dbc51d6215d6, type: 3}
+  - path: Templates/Struct.cs
+    asset: {fileID: 4900000, guid: 38b42f3b2f5290941a1ca5f8697ea879, type: 3}
+  - path: Templates/SerializedStruct.cs
+    asset: {fileID: 4900000, guid: 5a579dd7de4dfee4080547caf7cbca24, type: 3}
+  - path: Templates/Enum.cs
+    asset: {fileID: 4900000, guid: 734d4e63998c9644ba05b55ee14070ed, type: 3}
+  - path: Templates/Interface.cs
+    asset: {fileID: 4900000, guid: 56d9ff2ce69f2c442ba8612d2cc01944, type: 3}
+  - path: Templates/MonoBehaviour.cs
+    asset: {fileID: 4900000, guid: 8542904a5eb92204dbba8e11e972d838, type: 3}
+  - path: Templates/SingletonMonoBehaviour.cs
+    asset: {fileID: 4900000, guid: d6779385f5ec07a4bac89f8217841307, type: 3}
+  - path: Templates/AbstractSingletonMonoBehaviour.cs
+    asset: {fileID: 4900000, guid: 6aa3d18f151e6f3418eb25e6629af86a, type: 3}
+  - path: Templates/ScriptableObject.cs
+    asset: {fileID: 4900000, guid: f374ba3c5e9b5c34c91fa8f0cf5b499b, type: 3}
+  - path: Templates/IJobParallelFor.cs
+    asset: {fileID: 4900000, guid: 3769e0a952ca75344b7d6f86810d6bb3, type: 3}
+  - path: Templates/IJob.cs
+    asset: {fileID: 4900000, guid: fcb36f5dc7abd704cbbe6101eb9f6f5d, type: 3}
+  - path: Templates/UnitTest.cs
+    asset: {fileID: 4900000, guid: 3aa35a65cc5397b4597d65e2ebd834c2, type: 3}
+  - path: Templates/TextFile.txt
+    asset: {fileID: 4900000, guid: 95b2af4f597dcf845b511a4494eef3af, type: 3}
+  - path: Templates/JsonFile.json
+    asset: {fileID: 4900000, guid: 625c2a98a3a70634ebc8ad2810f4ccba, type: 3}
+  - path: Templates/MarkdownFile.md
+    asset: {fileID: 4900000, guid: 73e0c8a00b30c904d992199414609b66, type: 3}
+  - path: Templates/YamlFile.yaml
+    asset: {fileID: 4900000, guid: 35d4043f27603b34490775c1aad7ae73, type: 3}
