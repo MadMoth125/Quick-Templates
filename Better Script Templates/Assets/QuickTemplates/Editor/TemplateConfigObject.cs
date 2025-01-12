@@ -9,7 +9,7 @@ using UnityEditor;
 
 namespace QuickTemplates
 {
-	internal class TemplateDataObject : ScriptableObject
+	internal class TemplateConfigObject : ScriptableObject
 	{
 		[Serializable]
 		public enum PathMode
@@ -48,7 +48,7 @@ namespace QuickTemplates
 
 		public static IEnumerable<string> GetInstances()
 		{
-			return AssetDatabase.FindAssets($"t:{nameof(TemplateDataObject)}").Select(AssetDatabase.GUIDToAssetPath);
+			return AssetDatabase.FindAssets($"t:{nameof(TemplateConfigObject)}").Select(AssetDatabase.GUIDToAssetPath);
 		}
 
 		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
@@ -58,12 +58,12 @@ namespace QuickTemplates
 			if (instances.Length > 0)
 			{
 				string combinedPaths = string.Join('\n', instances);
-				Debug.LogWarning($"Cannot create multiple instances of type '{nameof(TemplateDataObject)}' in project.");
-				Debug.Log($"'{nameof(TemplateDataObject)}' instance(s) found at: {combinedPaths}");
+				Debug.LogWarning($"Cannot create multiple instances of type '{nameof(TemplateConfigObject)}' in project.");
+				Debug.Log($"'{nameof(TemplateConfigObject)}' instance(s) found at: {combinedPaths}");
 				return;
 			}
 
-			TemplateDataObject asset = CreateInstance<TemplateDataObject>();
+			TemplateConfigObject asset = CreateInstance<TemplateConfigObject>();
 
 			bool hasPath = EditorUtils.TryGetActiveFolderPath(out string path);
 			if (!hasPath) path = "Assets";
@@ -81,11 +81,11 @@ namespace QuickTemplates
 			var instances = GetInstances().ToArray();
 			if (instances.Length == 0)
 			{
-				Debug.LogWarning($"Cannot create menu items, no instance of type '{nameof(TemplateDataObject)}' in project.");
+				Debug.LogWarning($"Cannot create menu items, no instance of type '{nameof(TemplateConfigObject)}' in project.");
 				return;
 			}
 
-			var instance = AssetDatabase.LoadAssetAtPath<TemplateDataObject>(instances[0]);
+			var instance = AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(instances[0]);
 			instance.Generate();
 		}
 
