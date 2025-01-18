@@ -1,6 +1,6 @@
 {
     "name": "QuickTemplates",
-    "rootNamespace": "QuickTemplates",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [
         "Editor"

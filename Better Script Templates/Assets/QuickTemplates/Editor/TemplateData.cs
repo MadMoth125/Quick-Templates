@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace QuickTemplates
+namespace QuickTemplates.Editor
 {
 	[Serializable]
 	internal class TemplateData

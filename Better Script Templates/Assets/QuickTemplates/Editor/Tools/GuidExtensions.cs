@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEditor;
 
-namespace QuickTemplates.Tools
+namespace QuickTemplates.Editor.Tools
 {
 	internal static class GuidExtensions
 	{

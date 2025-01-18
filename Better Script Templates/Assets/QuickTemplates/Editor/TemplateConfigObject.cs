@@ -1,13 +1,16 @@
 using System;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using QuickTemplates.Builders;
-using QuickTemplates.Tools;
-using UnityEngine;
+using System.Reflection;
+using Microsoft.CSharp;
+using QuickTemplates.Editor.Tools;
 using UnityEditor;
+using UnityEngine;
 
-namespace QuickTemplates
+namespace QuickTemplates.Editor
 {
 	internal class TemplateConfigObject : ScriptableObject
 	{
@@ -88,7 +91,7 @@ namespace QuickTemplates
 		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates
 		/// from the first found TemplateConfigObject instance.
 		/// </summary>
-		[MenuItem("QuickTemplates/Re-generate Menu Items")]
+		[MenuItem("QuickTemplates/Generate Templates")]
 		private static void GenerateFromFirstInstance()
 		{
 			var instances = GetInstances().ToArray();
@@ -105,7 +108,7 @@ namespace QuickTemplates
 		/// <summary>
 		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates.
 		/// </summary>
-		[ContextMenu("Re-generate Menu Items")]
+		[ContextMenu("Generate Templates")]
 		private void Generate()
 		{
 			string desiredPath = ConstructDirectory();
@@ -113,51 +116,135 @@ namespace QuickTemplates
 			// Make sure directory exists before writing to it
 			if (!Directory.Exists(desiredPath)) Directory.CreateDirectory(desiredPath);
 
-			Script script = new Script.Builder()
-					.WithName("QuickTemplateMenuItems")
-					.WithNamespace("QuickTemplates.Generated")
-					.AsInternal()
-					.AsStatic()
-					.WithUsingStatement("UnityEngine")
-					.WithUsingStatement("UnityEditor", isEditorOnly: true)
-					.WithMethods(CreateMethods())
-					.Build();
+			// Create root compile unit for other C# elements to be assigned
+			CodeCompileUnit compileUnit = new CodeCompileUnit()
+			{
+				Namespaces =
+				{
+					new CodeNamespace() // Define namespace
+					{
+						Name = "QuickTemplates.Editor.Generated",
+						Imports =
+						{
+							// No need to import anything
+						},
+						Types =
+						{
+							new CodeTypeDeclaration() // Define class within namespace
+							{
+								Name = "QuickTemplateMenuItems",
+								IsClass = true,
+								// Can't find a way to make class static, so internal abstract is the best I can do
+								TypeAttributes = TypeAttributes.NotPublic | TypeAttributes.Abstract
+							} // class end
+						},
+					} // namespace end
+				}
+			};
 
-			// Create/overwrite script file at desired path
-			File.WriteAllText(Path.Combine(desiredPath, "QuickTemplateMenuItems.generated.cs"), script.ToString());
-			// Refresh assets to compile script
-			AssetDatabase.Refresh();
+			// Pull reference(s) from compile unit for name/namespace to have easier access
+			CodeNamespace namespaceDeclaration = compileUnit.Namespaces[^1];
+			CodeTypeDeclaration classDeclaration = compileUnit.Namespaces[^1].Types[^1];
+
+			#region Method Generation
+
+			for (var i = 0; i < templates.Count; i++)
+			{
+				// Unique GUID with invalid characters removed
+				string identifier = GUID.Generate().ToSimpleString();
+
+				// Derive info from asset for generated method
+				string assetPath = AssetDatabase.GetAssetPath(templates[i].asset); // Assets/.../Template_File.cs.txt
+				string assetName = templates[i].asset.name.Replace(" ", "_"); // Template_File.cs
+				string assetNameExtensionless = Path.GetFileNameWithoutExtension(assetName); // Template_File
+				string outFileName = $"New{assetName.Replace(templatePrefix, "")}"; // NewFile.cs
+
+				// Append 'Assets/Create/' to path if it doesn't already exist
+				string menuPath = templates[i].path.StartsWith(AssetCreatePath) ? templates[i].path : AssetCreatePath + templates[i].path;
+
+				// Define method base with custom name & method attributes
+				var method = new CodeMemberMethod()
+				{
+					Name = $"Create{assetNameExtensionless.Replace(" ", "")}_{identifier}",
+					// ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
+					Attributes = MemberAttributes.Private | MemberAttributes.Static,
+					CustomAttributes =
+					{
+						new CodeAttributeDeclaration() // Define attribute [MenuItem()]
+						{
+							Name = typeof(UnityEditor.MenuItem).ToString(),
+							Arguments =
+							{
+								// 'Assets/Create/' menu path
+								new CodeAttributeArgument()
+								{
+									Value = new CodePrimitiveExpression(
+										$"{StringUtils.SanitizeDirectory(menuPath, endWithSeparator: false)}")
+								},
+								// Menu order
+								new CodeAttributeArgument()
+								{
+									Name = "priority",
+									Value = new CodePrimitiveExpression(i - 100)
+								}
+							}
+						} // attribute end [MenuItem()]
+					},
+					Statements =
+					{
+						new CodeMethodInvokeExpression(
+								new CodeTypeReferenceExpression(typeof(UnityEditor.ProjectWindowUtil)), // Type to call method from
+								nameof(UnityEditor.ProjectWindowUtil.CreateScriptAssetFromTemplateFile)) // Method name to call from type
+							{
+								Parameters =
+								{
+									new CodePrimitiveExpression($"{assetPath}"), // Template asset location
+									new CodePrimitiveExpression($"{outFileName}"), // Output file location
+								}
+							}
+					}
+				};
+
+				// Add method to outer class
+				classDeclaration.Members.Add(method);
+
+				// Add preprocessor directive to ensure method is editor-only
+				method.StartDirectives.Add(new CodeRegionDirective()
+				{
+					RegionMode = CodeRegionMode.Start,
+					RegionText = "#if UNITY_EDITOR"
+				});
+
+				method.EndDirectives.Add(new CodeRegionDirective()
+				{
+					RegionMode = CodeRegionMode.End,
+					RegionText = "#endif"
+				});
+			}
+
+			#endregion
+
+			// Begin generating C# code from compile unit
+			var provider = new CSharpCodeProvider();
+			using (var writer = new StringWriter())
+			{
+				var options = new CodeGeneratorOptions()
+				{
+					IndentString = "\t", // Ensure tabs are used instead of spaces
+					BracingStyle = "C",  // Ensure brackets are placed on new lines
+				};
+
+				// Assign code to the current StringWriter
+				provider.GenerateCodeFromCompileUnit(compileUnit, writer, options);
+
+				// Create/overwrite script file at desired path
+				File.WriteAllText(Path.Combine(desiredPath, "QuickTemplateMenuItems.generated.cs"), writer.GetStringBuilder().ToString());
+
+				// Refresh assets to compile script
+				AssetDatabase.Refresh();
+			}
 
 			return;
-
-			IEnumerable<(string, bool)> CreateMethods()
-			{
-				int count = 0;
-				foreach (var data in templates)
-				{
-					// Unique GUID with invalid characters removed
-					string identifier = GUID.Generate().ToSimpleString();
-
-					// Derive info from asset for generated method
-					string assetPath = AssetDatabase.GetAssetPath(data.asset); // Assets/.../Template_File.cs.txt
-					string assetName = data.asset.name.Replace(" ", "_"); // Template_File.cs
-					string assetNameExtensionless = Path.GetFileNameWithoutExtension(assetName); // Template_File
-					string outFileName = $"New{assetName.Replace(templatePrefix, "")}"; // NewFile.cs
-
-					// Append 'Assets/Create/' to path if it doesn't already exist
-					string menuPath = data.path.StartsWith(AssetCreatePath) ? data.path : AssetCreatePath + data.path;
-
-					Method.Builder methodBuilder = new Method.Builder()
-							.WithName($"Create{assetNameExtensionless.Replace(" ", "")}_{identifier}")
-							.AsPrivate()
-							.AsStatic()
-							.WithLogic($@"ProjectWindowUtil.CreateScriptAssetFromTemplateFile(""{assetPath}"", ""{outFileName}"")")
-							.WithAttribute($@"MenuItem(""{StringUtils.SanitizeDirectory(menuPath, endWithSeparator: false)}"", priority = {count++ - 100})")
-						;
-
-					yield return (methodBuilder.Build().ToString(), true);
-				}
-			}
 
 			string ConstructDirectory(char separator = '/')
 			{

@@ -1,9 +1,7 @@
 using System.Reflection;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 
-namespace QuickTemplates.Tools
+namespace QuickTemplates.Editor.Tools
 {
 	internal static class EditorUtils
 	{
