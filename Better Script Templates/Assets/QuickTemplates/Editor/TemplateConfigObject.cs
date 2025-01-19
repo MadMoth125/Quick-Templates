@@ -50,7 +50,9 @@ namespace QuickTemplates.Editor
 		public List<TemplateData> templates;
 
 		/// <summary>
-		/// Generates a C# script that creates custom menu items based on the defined templates.
+		/// Generates a C# script that creates custom menu items for asset templates.
+		/// The script is created in a specified directory and includes methods for each
+		/// template, allowing for easy asset creation from the Unity editor.
 		/// </summary>
 		[ContextMenu("Generate Templates")]
 		private void Generate()
@@ -238,52 +240,52 @@ namespace QuickTemplates.Editor
 			return paths.Length > 0 ? AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(paths[0]) : null;
 		}
 
+		#region Menu Item Methods
+
 		/// <summary>
-		/// Static method with the MenuItem attribute for creating TemplateConfigObject instances,
-		/// mimicking the functionality of the CreateAssetMenu attribute for ScriptableObjects.
-		/// A dedicated method is used instead of class attribute, so we can have validation when creating instances.
+		/// Creates instances of TemplateConfigObject via a MenuItem, allowing for validation
+		/// to prevent duplicate assets in the project.
 		/// </summary>
 		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
 		private static void CreateAsset()
 		{
+			// Find ALL asset paths so the user can check where duplicates are
 			var instances = FindAssetPaths().ToArray();
 			if (instances.Length > 0)
 			{
 				string combinedPaths = string.Join('\n', instances);
-				Debug.LogWarning($"Cannot create multiple instances of type '{nameof(TemplateConfigObject)}' in project.");
-				Debug.Log($"'{nameof(TemplateConfigObject)}' instance(s) found at: {combinedPaths}");
+				Debug.LogWarning($"Creation failed! An instance of '{nameof(TemplateConfigObject)}' already exists in the project.");
+				Debug.Log($"Instance(s) of '{nameof(TemplateConfigObject)}' found at:\n{combinedPaths}");
 				return;
 			}
 
 			TemplateConfigObject asset = CreateInstance<TemplateConfigObject>();
+			EditorUtility.SetDirty(asset);
 
 			bool hasPath = EditorUtils.TryGetActiveFolderPath(out string path);
 			if (!hasPath) path = "Assets";
 
 			AssetDatabase.CreateAsset(asset, $"{path}/NewTemplateConfigAsset.asset");
-			AssetDatabase.SaveAssets();
+			AssetDatabase.SaveAssetIfDirty(asset);
 			EditorUtility.FocusProjectWindow();
 
 			Selection.activeObject = asset;
 		}
 
-		/// <summary>
-		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates
-		/// from the first found TemplateConfigObject instance.
-		/// </summary>
 		[MenuItem("QuickTemplates/Generate Templates")]
-		private static void GenerateFromFirstInstance()
+		private static void StaticGenerate()
 		{
-			var instances = FindAssetPaths().ToArray();
-			if (instances.Length == 0)
+			var inst = FindFirstAsset();
+			if (!inst)
 			{
-				Debug.LogWarning($"Cannot create menu items, no instance of type '{nameof(TemplateConfigObject)}' in project.");
+				Debug.LogWarning($"Generation failed! No instance of '{nameof(TemplateConfigObject)}' found in the project.");
 				return;
 			}
 
-			var instance = AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(instances[0]);
-			instance.Generate();
+			inst.Generate();
 		}
+
+		#endregion
 
 		/// <summary>
 		/// Finds all valid text file templates in the project, filters them based on an optional prefix,
