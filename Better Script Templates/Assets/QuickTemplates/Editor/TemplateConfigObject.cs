@@ -92,10 +92,10 @@ namespace QuickTemplates.Editor
 
 			#endregion
 
+			#region Method Generation
+
 			// Pull reference from compile unit for easier access
 			CodeTypeDeclaration classDeclaration = compileUnit.Namespaces[0].Types[0];
-
-			#region Method Generation
 
 			for (var i = 0; i < templates.Count; i++)
 			{
@@ -229,6 +229,8 @@ namespace QuickTemplates.Editor
 			}
 		}
 
+		#region Find Asset(s) Methods
+
 		public static IEnumerable<string> FindAssetPaths()
 		{
 			return AssetDatabase.FindAssets($"t:{nameof(TemplateConfigObject)}").Select(AssetDatabase.GUIDToAssetPath);
@@ -240,57 +242,10 @@ namespace QuickTemplates.Editor
 			return paths.Length > 0 ? AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(paths[0]) : null;
 		}
 
-		#region Menu Item Methods
-
-		/// <summary>
-		/// Creates instances of TemplateConfigObject via a MenuItem, allowing for validation
-		/// to prevent duplicate assets in the project.
-		/// </summary>
-		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
-		private static void CreateAsset()
-		{
-			// Find ALL asset paths so the user can check where duplicates are
-			var instances = FindAssetPaths().ToArray();
-			if (instances.Length > 0)
-			{
-				string combinedPaths = string.Join('\n', instances);
-				Debug.LogWarning($"Creation failed! An instance of '{nameof(TemplateConfigObject)}' already exists in the project.");
-				Debug.Log($"Instance(s) of '{nameof(TemplateConfigObject)}' found at:\n{combinedPaths}");
-				return;
-			}
-
-			TemplateConfigObject asset = CreateInstance<TemplateConfigObject>();
-			EditorUtility.SetDirty(asset);
-
-			bool hasPath = EditorUtils.TryGetActiveFolderPath(out string path);
-			if (!hasPath) path = "Assets";
-
-			AssetDatabase.CreateAsset(asset, $"{path}/NewTemplateConfigAsset.asset");
-			AssetDatabase.SaveAssetIfDirty(asset);
-			EditorUtility.FocusProjectWindow();
-
-			Selection.activeObject = asset;
-		}
-
-		[MenuItem("QuickTemplates/Generate Templates")]
-		private static void StaticGenerate()
-		{
-			var inst = FindFirstAsset();
-			if (!inst)
-			{
-				Debug.LogWarning($"Generation failed! No instance of '{nameof(TemplateConfigObject)}' found in the project.");
-				return;
-			}
-
-			inst.Generate();
-		}
-
 		#endregion
 
-		/// <summary>
-		/// Finds all valid text file templates in the project, filters them based on an optional prefix,
-		/// and adds their data to the templates list with estimated menu paths.
-		/// </summary>
+		#region TemplateData List Options
+
 		[ContextMenu("Find Templates")]
 		private void FindTemplates()
 		{
@@ -349,6 +304,55 @@ namespace QuickTemplates.Editor
 			{
 				Debug.Log($"Cannot sort with '{templates.Count}' elements!");
 			}
+		}
+
+		#endregion
+
+		#endregion
+
+		#region Menu Item Methods
+
+		/// <summary>
+		/// Creates instances of TemplateConfigObject via a MenuItem, allowing for validation
+		/// to prevent duplicate assets in the project.
+		/// </summary>
+		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
+		private static void CreateAsset()
+		{
+			// Find ALL asset paths so the user can check where duplicates are
+			var instances = FindAssetPaths().ToArray();
+			if (instances.Length > 0)
+			{
+				string combinedPaths = string.Join('\n', instances);
+				Debug.LogWarning($"Creation failed! An instance of '{nameof(TemplateConfigObject)}' already exists in the project.");
+				Debug.Log($"Instance(s) of '{nameof(TemplateConfigObject)}' found at:\n{combinedPaths}");
+				return;
+			}
+
+			TemplateConfigObject asset = CreateInstance<TemplateConfigObject>();
+			EditorUtility.SetDirty(asset);
+
+			bool hasPath = EditorUtils.TryGetActiveFolderPath(out string path);
+			if (!hasPath) path = "Assets";
+
+			AssetDatabase.CreateAsset(asset, $"{path}/NewTemplateConfigAsset.asset");
+			AssetDatabase.SaveAssetIfDirty(asset);
+			EditorUtility.FocusProjectWindow();
+
+			Selection.activeObject = asset;
+		}
+
+		[MenuItem("QuickTemplates/Generate Templates")]
+		private static void StaticGenerate()
+		{
+			var inst = FindFirstAsset();
+			if (!inst)
+			{
+				Debug.LogWarning($"Generation failed! No instance of '{nameof(TemplateConfigObject)}' found in the project.");
+				return;
+			}
+
+			inst.Generate();
 		}
 
 		#endregion
