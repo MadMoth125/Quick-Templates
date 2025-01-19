@@ -50,71 +50,21 @@ namespace QuickTemplates.Editor
 		public List<TemplateData> templates;
 
 		/// <summary>
-		/// Finds all paths of TemplateConfigObject assets in project.
-		/// </summary>
-		/// <returns>A collection of strings representing paths of assets in the project folder.</returns>
-		public static IEnumerable<string> GetInstances()
-		{
-			return AssetDatabase.FindAssets($"t:{nameof(TemplateConfigObject)}").Select(AssetDatabase.GUIDToAssetPath);
-		}
-
-		/// <summary>
-		/// Static method with the MenuItem attribute for creating TemplateConfigObject instances,
-		/// mimicking the functionality of the CreateAssetMenu attribute for ScriptableObjects.
-		/// A dedicated method is used instead of class attribute, so we can have validation when creating instances.
-		/// </summary>
-		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
-		private static void CreateAsset()
-		{
-			var instances = GetInstances().ToArray();
-			if (instances.Length > 0)
-			{
-				string combinedPaths = string.Join('\n', instances);
-				Debug.LogWarning($"Cannot create multiple instances of type '{nameof(TemplateConfigObject)}' in project.");
-				Debug.Log($"'{nameof(TemplateConfigObject)}' instance(s) found at: {combinedPaths}");
-				return;
-			}
-
-			TemplateConfigObject asset = CreateInstance<TemplateConfigObject>();
-
-			bool hasPath = EditorUtils.TryGetActiveFolderPath(out string path);
-			if (!hasPath) path = "Assets";
-
-			AssetDatabase.CreateAsset(asset, $"{path}/NewTemplateConfigAsset.asset");
-			AssetDatabase.SaveAssets();
-			EditorUtility.FocusProjectWindow();
-
-			Selection.activeObject = asset;
-		}
-
-		/// <summary>
-		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates
-		/// from the first found TemplateConfigObject instance.
-		/// </summary>
-		[MenuItem("QuickTemplates/Generate Templates")]
-		private static void GenerateFromFirstInstance()
-		{
-			var instances = GetInstances().ToArray();
-			if (instances.Length == 0)
-			{
-				Debug.LogWarning($"Cannot create menu items, no instance of type '{nameof(TemplateConfigObject)}' in project.");
-				return;
-			}
-
-			var instance = AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(instances[0]);
-			instance.Generate();
-		}
-
-		/// <summary>
-		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates.
+		/// Generates a C# script that creates custom menu items based on the defined templates.
 		/// </summary>
 		[ContextMenu("Generate Templates")]
 		private void Generate()
 		{
+			const string @namespace = "QuickTemplates.Editor.Generated";
+			const string @class = "QuickTemplateMenuItems";
+			const string scriptName = "QuickTemplateMenuItems.generated.cs";
+
 			string desiredPath = ConstructDirectory();
 
 			// Make sure directory exists before writing to it
 			if (!Directory.Exists(desiredPath)) Directory.CreateDirectory(desiredPath);
+
+			#region Namespace/Class Generation
 
 			// Create root compile unit for other C# elements to be assigned
 			CodeCompileUnit compileUnit = new CodeCompileUnit()
@@ -123,16 +73,12 @@ namespace QuickTemplates.Editor
 				{
 					new CodeNamespace() // Define namespace
 					{
-						Name = "QuickTemplates.Editor.Generated",
-						Imports =
-						{
-							// No need to import anything
-						},
+						Name = @namespace,
 						Types =
 						{
 							new CodeTypeDeclaration() // Define class within namespace
 							{
-								Name = "QuickTemplateMenuItems",
+								Name = @class,
 								IsClass = true,
 								// Can't find a way to make class static, so internal abstract is the best I can do
 								TypeAttributes = TypeAttributes.NotPublic | TypeAttributes.Abstract
@@ -142,9 +88,10 @@ namespace QuickTemplates.Editor
 				}
 			};
 
-			// Pull reference(s) from compile unit for name/namespace to have easier access
-			CodeNamespace namespaceDeclaration = compileUnit.Namespaces[^1];
-			CodeTypeDeclaration classDeclaration = compileUnit.Namespaces[^1].Types[^1];
+			#endregion
+
+			// Pull reference from compile unit for easier access
+			CodeTypeDeclaration classDeclaration = compileUnit.Namespaces[0].Types[0];
 
 			#region Method Generation
 
@@ -224,6 +171,8 @@ namespace QuickTemplates.Editor
 
 			#endregion
 
+			#region Writing Code to File
+
 			// Begin generating C# code from compile unit
 			var provider = new CSharpCodeProvider();
 			using (var writer = new StringWriter())
@@ -238,11 +187,13 @@ namespace QuickTemplates.Editor
 				provider.GenerateCodeFromCompileUnit(compileUnit, writer, options);
 
 				// Create/overwrite script file at desired path
-				File.WriteAllText(Path.Combine(desiredPath, "QuickTemplateMenuItems.generated.cs"), writer.GetStringBuilder().ToString());
+				File.WriteAllText(Path.Combine(desiredPath, scriptName), writer.GetStringBuilder().ToString());
 
 				// Refresh assets to compile script
 				AssetDatabase.Refresh();
 			}
+
+			#endregion
 
 			return;
 
@@ -274,6 +225,62 @@ namespace QuickTemplates.Editor
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Finds all paths of TemplateConfigObject assets in project.
+		/// </summary>
+		/// <returns>A collection of strings representing paths of assets in the project folder.</returns>
+		public static IEnumerable<string> GetInstances()
+		{
+			return AssetDatabase.FindAssets($"t:{nameof(TemplateConfigObject)}").Select(AssetDatabase.GUIDToAssetPath);
+		}
+
+		/// <summary>
+		/// Static method with the MenuItem attribute for creating TemplateConfigObject instances,
+		/// mimicking the functionality of the CreateAssetMenu attribute for ScriptableObjects.
+		/// A dedicated method is used instead of class attribute, so we can have validation when creating instances.
+		/// </summary>
+		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
+		private static void CreateAsset()
+		{
+			var instances = GetInstances().ToArray();
+			if (instances.Length > 0)
+			{
+				string combinedPaths = string.Join('\n', instances);
+				Debug.LogWarning($"Cannot create multiple instances of type '{nameof(TemplateConfigObject)}' in project.");
+				Debug.Log($"'{nameof(TemplateConfigObject)}' instance(s) found at: {combinedPaths}");
+				return;
+			}
+
+			TemplateConfigObject asset = CreateInstance<TemplateConfigObject>();
+
+			bool hasPath = EditorUtils.TryGetActiveFolderPath(out string path);
+			if (!hasPath) path = "Assets";
+
+			AssetDatabase.CreateAsset(asset, $"{path}/NewTemplateConfigAsset.asset");
+			AssetDatabase.SaveAssets();
+			EditorUtility.FocusProjectWindow();
+
+			Selection.activeObject = asset;
+		}
+
+		/// <summary>
+		/// Generates a C# script that creates custom "Assets/Create" menu items based on the defined templates
+		/// from the first found TemplateConfigObject instance.
+		/// </summary>
+		[MenuItem("QuickTemplates/Generate Templates")]
+		private static void GenerateFromFirstInstance()
+		{
+			var instances = GetInstances().ToArray();
+			if (instances.Length == 0)
+			{
+				Debug.LogWarning($"Cannot create menu items, no instance of type '{nameof(TemplateConfigObject)}' in project.");
+				return;
+			}
+
+			var instance = AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(instances[0]);
+			instance.Generate();
 		}
 
 		/// <summary>
