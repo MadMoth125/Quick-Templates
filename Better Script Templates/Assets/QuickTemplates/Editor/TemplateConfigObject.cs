@@ -227,13 +227,15 @@ namespace QuickTemplates.Editor
 			}
 		}
 
-		/// <summary>
-		/// Finds all paths of TemplateConfigObject assets in project.
-		/// </summary>
-		/// <returns>A collection of strings representing paths of assets in the project folder.</returns>
-		public static IEnumerable<string> GetInstances()
+		public static IEnumerable<string> FindAssetPaths()
 		{
 			return AssetDatabase.FindAssets($"t:{nameof(TemplateConfigObject)}").Select(AssetDatabase.GUIDToAssetPath);
+		}
+
+		public static TemplateConfigObject FindFirstAsset()
+		{
+			var paths = FindAssetPaths().ToArray();
+			return paths.Length > 0 ? AssetDatabase.LoadAssetAtPath<TemplateConfigObject>(paths[0]) : null;
 		}
 
 		/// <summary>
@@ -244,7 +246,7 @@ namespace QuickTemplates.Editor
 		[MenuItem(AssetCreatePath + "QuickTemplates/Template Configuration Asset", priority = int.MaxValue)]
 		private static void CreateAsset()
 		{
-			var instances = GetInstances().ToArray();
+			var instances = FindAssetPaths().ToArray();
 			if (instances.Length > 0)
 			{
 				string combinedPaths = string.Join('\n', instances);
@@ -272,7 +274,7 @@ namespace QuickTemplates.Editor
 		[MenuItem("QuickTemplates/Generate Templates")]
 		private static void GenerateFromFirstInstance()
 		{
-			var instances = GetInstances().ToArray();
+			var instances = FindAssetPaths().ToArray();
 			if (instances.Length == 0)
 			{
 				Debug.LogWarning($"Cannot create menu items, no instance of type '{nameof(TemplateConfigObject)}' in project.");
