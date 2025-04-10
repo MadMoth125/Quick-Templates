@@ -55,7 +55,7 @@ namespace QuickTemplates.Editor
 		/// template, allowing for easy asset creation from the Unity editor.
 		/// </summary>
 		[ContextMenu("Generate Templates")]
-		private void Generate()
+		public void Generate()
 		{
 			const string @namespace = "QuickTemplates.Editor.Generated";
 			const string @class = "QuickTemplateMenuItems";
@@ -343,7 +343,7 @@ namespace QuickTemplates.Editor
 		}
 
 		[MenuItem("QuickTemplates/Generate Templates")]
-		private static void StaticGenerate()
+		public static void StaticGenerate()
 		{
 			var inst = FindFirstAsset();
 			if (!inst)
