@@ -1,4 +1,4 @@
-# Better Script Templates
+# Quick Templates
 
 Custom templates, clean output — skip the fluff and start coding faster.
 
